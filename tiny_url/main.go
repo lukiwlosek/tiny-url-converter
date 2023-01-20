@@ -31,7 +31,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	// Initialize a session that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials
 	// and region from the shared configuration file ~/.aws/config.
-
+	
 	//setup 
 	tableName := "TinyUrlLukasz"
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
@@ -87,6 +87,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 		// hash the url and shorten it
 		id := GetMD5Hash(event.Url)[0:7]
+		fullPath := "https://" + request.Headers["Host"] + request.Path + "?=" + id
 		item := Item{
 				Id:   id,
 				Url:  event.Url,
@@ -110,7 +111,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		fmt.Println("Successfully added '" + item.Id + "' (" + item.Url + ") to table " + tableName)
 		
 		// convert item for resposne
-		itemMarshalled, err := json.Marshal(item)
+		itemMarshalled, err := json.Marshal(MyEvent{Url: fullPath})
 		if err != nil {
 			log.Fatalf("Got error marshall: %s", err)
 		}
